@@ -91,7 +91,9 @@ int main() {
 					FName = input_file_name();
 					cont.file_input(std::fstream(FName, std::ios::in));
 				}
-				catch (const char* str) { std::cout << str << std::endl; }
+				catch (const char* str) {
+					std::cout << str << std::endl; cont.clear();
+				}
 				break;
 			case 0: break;
 			}

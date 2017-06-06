@@ -464,10 +464,11 @@ Date input_date(std::string message = "Input date in format hh:mm dd/mm/yyyy : "
 
 bool check_monthly_payment(std::string price) {
 	size_t i = 0;
-	while ((i < price.length()) && ((price[i] == ' ') || (price[i] == '	'))) { ++i; }
+	while ((i < price.length()) && ((price[i] == ' ') || (price[i] == '\t'))) { ++i; }
 	if (i >= price.length()) { return false; }
 
 	switch (price[i]) {
+	case '.': { return false; } //.1 не пройдет!
 	case '-': { return false; }
 	case '+': { ++i; break; }
 	default: { break; }
@@ -483,7 +484,7 @@ bool check_monthly_payment(std::string price) {
 		result = ((price[j] >= '0') && (price[j] <= '9')) || ((price[j] == '.') && (dot_number <= 1));
 		++j;
 	}
-	while ((j < price.length()) && ((price[j] == ' ') || (price[j] == '	'))) { ++j; } // .1
+	while ((j < price.length()) && ((price[j] == ' ') || (price[j] == '\t'))) { ++j; }
 	return (j == price.length()) && (result);
 }
 
