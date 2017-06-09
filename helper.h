@@ -86,17 +86,17 @@ std::istream& operator>> (std::istream& is, Customer &cust) {
 	is >> str1;
 	is >> str2;
 	if (!(Date::str_to_date(str1 + " " + str2, cust.begin_date)))
-		throw "Incorrect file";
+		throw " ";
 	is >> str1; 
 	if (str1 == "+") { cust.payment = true; }
 	else if (str1 == "-") { cust.payment = false; }
-		else throw "Incorrect file";
+		else throw " ";
 	dec::fromStream(is, cust.monthly_payment);
-	if (!check_monthly_payment) throw "Incorrect file";
+	if (!check_monthly_payment) throw " ";
 	is >> str1;
 	is >> str2;
 	if (!(Date::str_to_date(str1 + " " + str2, cust.date_of_pay)))
-		throw "Incorrect file";
+		throw " ";
 	return is;
 }
 
@@ -252,30 +252,24 @@ public:
 };
 
 template <class P>
-class AbsÑontainer {
+class AbsContainer {
 protected:
 	std::vector<P> vect;
 public:
 	typedef std::_Vector_iterator<std::_Vector_val<std::_Simple_types<P>>> my_iterator;
 
-	AbsÑontainer(int size) {
+	AbsContainer(int size) {
 		vect = std::vector<P>(size);
 	}
 
-	AbsÑontainer() {
+	AbsContainer() {
 		vect = std::vector<P>();
 	}
 
-	~AbsÑontainer() {}
+	~AbsContainer() {}
 
-	bool add(P cust) {
-		if (!find(cust))
-		{
+	void add(P cust) {
 			vect.push_back(cust);
-			return true;
-		}
-		else
-			return false;
 	}
 
 	bool find(P cust, std::random_access_iterator_tag &it) {
@@ -320,12 +314,12 @@ public:
 	void remove(my_iterator &it) { vect.erase(it); }
 };
 
-class Ñontainer : public AbsÑontainer<Customer> {
+class Container : public AbsContainer<Customer> {
 public:
 
-	Ñontainer(std::vector<Customer> v) { vect = v; }
+	Container(std::vector<Customer> v) { vect = v; }
 
-	Ñontainer() { vect = std::vector<Customer>(); }
+	Container() { vect = std::vector<Customer>(); }
 
 	bool find_by_surname(std::string sur, std::vector<Customer>::iterator &it) {
 		return find_by(surname_pred(sur), it);
@@ -359,33 +353,42 @@ public:
 		return find_by_binary(date_of_pay_comp(), Customer("", "", "", "", 0, Date(), false, dec::decimal_cast<2>(0), date), it) && it->date_of_pay == date;
 	}
 
-	Ñontainer find_subset_by_surname(std::string s) {
-		return Ñontainer(find_subset_by(surname_acc(s)));
+	Container find_subset_by_surname(std::string s) {
+		return Container(find_subset_by(surname_acc(s)));
 	}
 
-	Ñontainer find_subset_by_district(std::string s) {
-		return Ñontainer(find_subset_by(district_acc(s)));
+	Container find_subset_by_district(std::string s) {
+		return Container(find_subset_by(district_acc(s)));
 	}
 
-	Ñontainer find_subset_by_begin_date(Date d) {
-		return Ñontainer(find_subset_by(begin_date_acc(d)));
+	Container find_subset_by_begin_date(Date d) {
+		return Container(find_subset_by(begin_date_acc(d)));
 	}
 
-	Ñontainer find_subset_by_date_of_pay(Date d) {
-		return Ñontainer(find_subset_by(date_of_pay_acc(d)));
+	Container find_subset_by_date_of_pay(Date d) {
+		return Container(find_subset_by(date_of_pay_acc(d)));
 	}
 
 	void file_input(std::fstream& fin) {
 		if (fin.is_open()) {
-			std::istream_iterator<Customer> is(fin);
+			Customer cust;
+
 			vect.clear();
-			if (fin.eof()) return;
-			Customer cust = *is++;
-			while (!fin.eof()) {
-				add(cust); 
-				cust = *is++;
+			try {
+				std::istream_iterator<Customer> is(fin);
+				while ((!fin.eof()) && !fin.bad()) {
+					cust = *is;
+					add(cust);
+					is++;
+				}
 			}
-			if (cust.surname != "") add(cust);
+			catch (const char*) {
+				if (!fin.eof()) {
+					fin.close();
+					vect.clear();
+					throw "File isn't correct";
+				}
+			};
 			fin.close();
 		}
 		else throw "File not found";
@@ -510,7 +513,7 @@ Customer input_customer() {
 	Date begin_date, date_of_pay;
 	bool payment;
 	dec::decimal<2> monthly_payment;
-	std::cout << "-------------Customer------------" << std::endl;
+	std::cout << "----------------------------------" << std::endl;
 	std::cout << "Surname: ";
 	std::cin >> surname;
 	if (surname == "exit") throw "exit";
@@ -530,7 +533,7 @@ Customer input_customer() {
 	}
 	ok = false;
 	while (!ok) {
-		try { begin_date = input_date("Date of contract: "); ok = true; }
+		try { begin_date = input_date("Date of contract in format(mm:hh  dd / mm / yyyy) : "); ok = true; }
 		catch (char) { std::cout << "You can't skip this: "; }
 	}
 	ok = false;
@@ -545,7 +548,7 @@ Customer input_customer() {
 	}
 	ok = false;
 	while (!ok) {
-		try { date_of_pay = input_date("Date of last payment: "); ok = true; }
+		try { date_of_pay = input_date("Date of last payment in format(mm:hh  dd / mm / yyyy) : "); ok = true; }
 		catch (char) { std::cout << "You can't skip this: "; }
 	}
 	std::cout << "----------------------------------" << std::endl;
@@ -560,7 +563,7 @@ Customer input_customer(Customer cust) {
 	dec::decimal<2> monthly_payment;
 	std::string str;
 
-	std::cout << "-------------Customer------------" << std::endl;
+	std::cout << "----------------------------------" << std::endl;
 	std::cout << "Surname(dafault : " + cust.surname + "): ";
 	std::cin >> surname;
 	if (surname == "skip") surname = cust.surname;
@@ -605,7 +608,7 @@ static void print_head() {
 	std::cout << "Surname\t" << "Dist\t" << "Address\t" << "Phone\t" << "Contract\t" << "Date of contract:\t" << "Paid\t" << "Payment\t" << "Last payment\n";
 }
 
-void console_input(Ñontainer& cont) {
+void console_input(Container& cont) {
 	cont.clear();
 	Customer cust;
 	bool add = true;
@@ -621,7 +624,7 @@ void console_input(Ñontainer& cont) {
 	}
 }
 
-void console_output(Ñontainer& cont) {
+void console_output(Container& cont) {
 	if (cont.size() != 0) {
 		print_head();
 		cont.output(std::ostream_iterator<Customer>(std::cout, "\n"));

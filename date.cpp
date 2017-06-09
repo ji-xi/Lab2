@@ -21,8 +21,7 @@ std::vector<std::string> split(const std::string &text, char sep) {
 }
 
 bool check_date(std::string date) {
-	if (date == " ")
-		return false;
+	if (date == " ") return false;
 
 	std::vector<std::string> tokens = split(date, ' ');
 	std::vector<std::string> tokens2 = split(tokens[1], '/');
@@ -104,8 +103,8 @@ std::string static to_string(Date date) {
 }
 
 bool Date::str_to_date(std::string str, Date & date) {
-	if (!check_date(str))
-		return false;
+		if (!check_date(str))
+			return false;
 
 	std::vector<std::string> tokens = split(str, ' ');
 	std::vector<std::string> tokens1 = split(tokens[1], '/');

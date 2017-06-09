@@ -23,7 +23,7 @@ public:
 
 	std::string const to_string();
 
-	std::string to_string(Date date);
+	//std::string to_string(Date date);
 
 	static bool str_to_date(std::string str, Date& date);
 

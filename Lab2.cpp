@@ -9,6 +9,8 @@
 // номер договора, дата заключения договора, оплата установки, абонентская плата помесячно, дата 
 // последнего платежа. Поиск по фамилии, району, дате заключения договора, дате последнего платежа. 
 
+
+
 void print_menu() {
 	std::cout << "________________________________________________________" << std::endl;
 	std::cout << "Menu:" << std::endl;
@@ -66,8 +68,8 @@ std::string input_file_name() {
 }
 
 int main() {
-	Сontainer cont = Сontainer();
-	Сontainer sub = Сontainer();
+	Container cont = Container();
+	Container sub = Container();
 	std::string str;
 	int n;
 	bool binarSearch;
@@ -92,7 +94,7 @@ int main() {
 					cont.file_input(std::fstream(FName, std::ios::in));
 				}
 				catch (const char* str) {
-					std::cout << str << std::endl; cont.clear();
+					std::cout << str << std::endl;
 				}
 				break;
 			case 0: break;
